@@ -19,7 +19,6 @@ def speak(audio):
 	engine.say(audio)
 	engine.runAndWait()
 
-
 def take_command():
 	"""
 	It takes microphone input from user
