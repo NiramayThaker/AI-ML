@@ -14,27 +14,22 @@ import pywhatkit as kit  # as kit = we can use pywhatkit by just writing kit
 import keyboard
 import requests
 import json
+from bs4 import BeautifulSoup
 
 # TODO:
-# Create projects
+# Calculate distance
 # Send message
 # Trace location
-# Gathering data (from APIs)
-# Contact
 # Get view from satellite
-# Gathers latest news to know
 # mark the way/route
-# Search for people
 # Identifies location (where am i)
 # Trace Time
 # Identify physical objects
-# Recording video/audio
 # Show time between 2 process
-# Youtube video downloader
-# URL Shortner
 
 
 # Done:
+# Create projects
 # google, youtube search
 # Date, time
 # Wikipedia
@@ -47,6 +42,8 @@ import json
 # Date, time, joke
 # Self reboot
 # Search number in truecaller
+# Gathers latest news to know
+# Gathering data (from APIs)
 
 
 engine = pyttsx3.init("sapi5")
@@ -179,23 +176,15 @@ def take_command():
 
 def wait():
 	"""
-	will make ALEXIS sleep till doesn't called or quit
+	recursive function
+	which will make it sleep till doesn't called or quit
 	"""
 
-	speak("Type on your console as per given option to tell me what i should do ")
-	print("TYPE :-\n awake -: to continue")
-	print(" \n         'OR'          \n")
-	print("TYPE :-\n offline -: to leave")
-
-	i = input("\nType when you want to call me back ->> ").lower()
-
-	if i == 'come back' or 'awake':
-		speak("I am back for your service sir")
-	elif i == 'offline' or i == 'goodbye':
-		speak('good bye sir')
-		quit()
+	wake_word = ["wake up", "listen", "hey darling"]
+	i = take_command()
+	if i in wake_word:
+		return
 	else:
-		speak("can't recognize type it again")
 		wait()
 
 
@@ -302,6 +291,8 @@ def restart_yourself():
 
 
 def my_location():
+	"""will tell our current location (construction phase)"""
+
 	ip_addr = requests.get(url='https://api.ipify.org').text
 
 	# url = "https://get.geojs.io/v1/ip/geo" + ip_addr + ".json"
@@ -315,6 +306,8 @@ def my_location():
 
 
 def google_maps(place):
+	"""open google map with the location we asked for"""
+
 	place_url = "https://www.google.com/maps/place/" + str(place)
 	wb.open(url=place_url)
 
@@ -330,6 +323,10 @@ def search_caller():
 
 
 def press_keys(keys, n):
+	"""
+	Take speech from user and type the data given through voice
+	"""
+
 	for i in range(n):
 		if keys[i + 1] == "+":
 			pyautogui.keyDown(keys[i])
@@ -340,3 +337,114 @@ def press_keys(keys, n):
 			keyboard.press_and_release(keys[i])
 			if i == n - 1:
 				keyboard.press_and_release(keys[i + 1])
+
+
+def goto_home():
+	"""
+	Press windows shortcut key to take us to home screen
+	"""
+
+	keyboard.press_and_release("windows + d")
+
+
+def pc_power():
+	"""
+	restart or shut down the device
+	"""
+	to_do = "hibernate"
+	# to_do = take_command()
+	if "restart" or "restart" in to_do:
+		os.system("shutdown /r /t 1")
+
+	elif 'shutdown' or 'shut down' in to_do:
+		os.system("shutdown /s /t 1")
+
+	elif 'deep sleep' or 'hibernate' in to_do:
+		goto_home()
+		os.system("shutdown /h")
+
+
+def live_info():
+	"""
+	Will scrape live information from BRAVE Search engine and speak it
+	"""
+
+	while True:
+		speak("yes sir?")
+		search_data = take_command()
+		if search_data != "quit":
+			search_data = search_data.split()
+			search_data = [f"{i}+" for i in search_data]
+
+			print("".join(search_data))
+
+			response = requests.get(f"https://search.brave.com/search?q={search_data}&source=desktop")
+			soup = BeautifulSoup(response.text, "html.parser")
+
+			data = soup.find_all("p", class_="snippet-description")
+			reply_data = []
+
+			i = 0
+			while i <= 5:
+				reply_data.append(data[i].getText())
+				i += 1
+
+			speak(reply_data[random.randint(0, 5)])
+		else:
+			break
+	return
+
+
+def weather_report():
+	"""
+	Will get live data from weather.com official website and speak it
+	"""
+
+	responce = requests.get(
+		"https://weather.com/en-IN/weather/today/l/3a8a6728efe400fcaa265d133ca397f9398fc70aa1c49e34a6100c384c66dedf")
+	soup = BeautifulSoup(responce.text, "html.parser")
+
+	todays_weather = soup.find("div", class_="CurrentConditions--primary--2SVPh")
+
+	degree = todays_weather.find("span", class_="CurrentConditions--tempValue--3a50n").getText()
+	sky = todays_weather.find("div", class_="CurrentConditions--phraseValue--2Z18W").getText()
+	day_night = todays_weather.find("div", class_="CurrentConditions--tempHiLoValue--3SUHy").getText()
+
+	speak(day_night)
+	speak(f"currently {degree} and {sky} sky")
+
+
+def tech_updates():
+	"""
+	Get latest tech updates from API: https://newsapi.org/
+	"""
+
+	# speak("News of which country")
+	# country = take_command().lower()
+	speak("Topics of news")
+	category = take_command().lower()
+
+	resource = requests.get(
+		f"https://newsapi.org/v2/top-headlines?country=in&category={category}&apiKey=dfe8cc41cd4d4f0b9e96fa1af36d6eec")
+	news_json = resource.json()
+	total_results = news_json["totalResults"]
+	articles = news_json["articles"]
+	news = []
+
+	try:
+		for i in range(11):
+			news.append(articles[i]['title'])
+
+		stop, i = "", 0
+		speak(f"Total {total_results} results found, finding top 10 for you")
+		speak("Tell me next if you want me to read further")
+
+		while stop != "stop":
+			speak(news[i])
+			stop = take_command().lower()
+			i += 1
+	except:
+		speak("No result found")
+
+
+pc_power()
