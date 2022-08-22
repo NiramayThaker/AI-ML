@@ -130,5 +130,4 @@ def chat():
 
 		print(random.choice(responses))
 
-
 chat()
