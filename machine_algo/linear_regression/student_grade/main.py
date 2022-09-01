@@ -16,6 +16,7 @@ y = np.array(data[predict])
 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size=0.1)
 
 # Finding Best model out of 40 training
+
 # best = 0
 # for _ in range(40):
 # 	x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y, test_size=0.1)
