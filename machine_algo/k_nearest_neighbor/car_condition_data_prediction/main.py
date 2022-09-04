@@ -26,7 +26,7 @@ x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x, y
 model = KNeighborsClassifier(n_neighbors=10)  # 5 is a Hyper parameter(Number of neighbours to look for)
 model.fit(x_train, y_train)
 acc = model.score(x_test, y_test)
-print(acc)
+print(acc)  # Print Accuracy of the output base on test data
 
 predicted = model.predict(x_test)
 names = ["unacc", "acc", "good", "vgood"]
