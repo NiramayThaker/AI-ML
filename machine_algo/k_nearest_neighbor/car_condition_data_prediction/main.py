@@ -16,8 +16,8 @@ persons = le.fit_transform(data["persons"])
 lug_boot = le.fit_transform(data["lug_boot"])
 safety = le.fit_transform(data["safety"])
 cls = le.fit_transform(data["class"])
-predict = "cls"
 
+predict = "cls"
 x = list(zip(buying, maint, door, persons, lug_boot, safety, cls))
 y = list(cls)
 
