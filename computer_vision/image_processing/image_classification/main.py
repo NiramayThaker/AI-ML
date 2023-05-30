@@ -39,10 +39,12 @@ model = Sequential ([
     Dense(1, activation = 'sigmoid')
 ])
 
+# Compile let's model resume from where it stoped
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
 
-# model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
-# model.fit(X_train, Y_train, epochs = 5, batch_size = 64)
-# model.evaluate(X_test, Y_test)
+model.fit(X_train, Y_train, epochs = 5, batch_size = 64)
+
+model.evaluate(X_test, Y_test)
 
 # Making predictions
 idx2 = random.randint(0, len(Y_test))
